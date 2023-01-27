@@ -1,3 +1,4 @@
-print("Hello World")
-print("Does this work")
-print("This is a dragon game")
+def main():
+    print("This is a dragon game.")
+if __name__=="__main__":
+    main()
