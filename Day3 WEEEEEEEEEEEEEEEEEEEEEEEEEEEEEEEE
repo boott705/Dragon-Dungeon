@@ -1,0 +1,88 @@
+import random
+
+def main():
+    print("This is a dragon game.")
+    dungeon = Dungeon()
+    dungeon.generate()
+    
+class Player:
+    def movement(current_room_y, current_room_x):
+        PlayerPosition = [current_room_y][current_room_x]
+        direction = input("What way would you like to go (North, South, East, West, or Undo): ")
+        if direction == "North" or direction == "north":
+            if PlayerPosition[current_room_y + 1][current_room_x] == 0:
+                print("You can't go North.")
+            else:
+                PlayerPosition[current_room_y][current_room_x] = [current_room_y + 1][current_room_x]
+                print("You went through the north door.")
+                pass
+        elif direction == "south" or direction == "South":
+            print("You went through the south door.")
+        elif direction == "East" or direction == "east":
+            print("You went through the east door.")
+        elif direction == "West" or direction == "west":
+            print("You went through the west door.")
+        elif direction == "Undo" or direction == "undo":
+            Player.choice()
+        else:
+            print("invalid option")
+            Player.movement()
+
+    def choice(current_room_y, current_room_x):
+        doing = input("What would you like to do (Move or Take): ")
+        if doing == "Move" or doing == "move":
+            Player.movement(current_room_y, current_room_x)
+        elif doing == "Take" or doing == "take":
+            pass
+        pass
+
+class Dungeon:
+    def __init__(self):
+        self.rooms = {}
+        self.starting_room = None
+        self.dragon_lair = None
+        self.sword_room = None
+        self.shield_room = None
+        self.key_room = None
+        self.roar_room = None
+        self.num_dungeons_generated = 0
+
+        
+    
+    dungeon_map = [
+        [],
+        [],
+        [],
+        [],
+        []
+    ]
+
+    def generate(self):
+        dungeon_map = [
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0]
+        ]
+        good_dungeon = False
+        cols = 5
+        rows = 5
+        print(dungeon_map)
+        rooms = [1, 2, 3, 4, 5, 6, 
+    7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 
+    17, 18, 19, 20, 21, 22, 23, 24, 25]
+        
+        start_room_num = rooms[0]
+        starting_room_y = 4
+        starting_room_x = random.choice(range(4))
+        dungeon_map[starting_room_y][starting_room_x] = start_room_num
+        rooms.remove(start_room_num)
+        room_amount = 1
+        current_room_y = starting_room_y
+        current_room_x = starting_room_x
+        print(dungeon_map)
+        Player.choice(current_room_y, current_room_x)
+
+if __name__=="__main__":
+    main()
