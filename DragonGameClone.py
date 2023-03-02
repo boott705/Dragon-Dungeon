@@ -1,36 +1,9 @@
-import random
-# Main function
-def main():
-    # Tests main
-    print("This is a dragon game.")
-    dungeon = Dungeon()
-    dungeon.generate()
-
-
-class Dungeon:
-    def __init__(self):
-        self.rooms = {}
-        self.starting_room = None
-        self.dragon_lair = None
-        self.sword_room = None
-        self.shield_room = None
-        self.key_room = None
-        self.roar_room = None
-        self.num_dungeons_generated = 0
-
-        
-    
-    dungeon_map = [
-        [],
-        [],
-        [],
-        [],
-        []
-    ]
-
-    def create_branch(rooms, room_amount, dungeon_map, good_dungeon, current_room_y, current_room_x, break_off_points, previous_x, previous_y):
+def create_branch(rooms, room_amount, dungeon_map, good_dungeon, current_room_y, current_room_x, unused_rooms, previous_x, previous_y):
         print(dungeon_map)
         possible_rooms = []
+        isBreakOff = False
+        if random.choice(range(100)) > 95:
+            isBreakOff = True
         if room_amount == 16:
             good_dungeon = True
             return dungeon_map
@@ -64,86 +37,62 @@ class Dungeon:
                     if room == possible_room and room == 4:
                         adjacent_rooms.remove(4)
                         possible_rooms.append(room)
-            if len(possible_rooms) > 0:
+            if len(possible_rooms) > 0 and isBreakOff == False:
                 next_room = random.choice(possible_rooms)
+                possible_rooms.remove(next_room)
+                for room in possible_rooms:
+                        unused_rooms.append(rooms[0])
+                        if room == 1:
+                            dungeon_map[current_room_y + 1][current_room_x] = rooms[0]
+                            rooms.pop(0)
+                        if room == 2:
+                            dungeon_map[current_room_y][current_room_x + 1] = rooms[0]
+                            rooms.pop(0)
+                        if room == 3:
+                            dungeon_map[current_room_y - 1][current_room_x] = rooms[0]
+                            rooms.pop(0)
+                        if room == 4:
+                            dungeon_map[current_room_y][current_room_x - 1] = rooms[0]
+                            rooms.pop(0)
                 if next_room == 1:
                     room_amount += 1
-                    possible_rooms.remove(next_room)
                     dungeon_map[current_room_y + 1][current_room_x] = rooms[0]
                     rooms.pop(0)
                     previous_x = current_room_x
                     previous_y = current_room_y
                     current_room_y = current_room_y + 1
-                    current_room_x = current_room_x
-                    Dungeon.create_branch(rooms, room_amount, dungeon_map, good_dungeon, current_room_y, current_room_x, break_off_points, previous_x, previous_y)
+                    current_room_x = current_room_x                    
                 if next_room == 2:
                     room_amount += 1
-                    possible_rooms.remove(next_room)
                     dungeon_map[current_room_y][current_room_x + 1] = rooms[0]
                     rooms.pop(0)
                     previous_x = current_room_x
                     previous_y = current_room_y
                     current_room_y = current_room_y
                     current_room_x = current_room_x + 1
-                    Dungeon.create_branch(rooms, room_amount, dungeon_map, good_dungeon, current_room_y, current_room_x, break_off_points, previous_x, previous_y)
                 if next_room == 3:
                     room_amount += 1
-                    possible_rooms.remove(next_room)
                     dungeon_map[current_room_y - 1][current_room_x] = rooms[0]
                     rooms.pop(0)
                     previous_x = current_room_x
                     previous_y = current_room_y
                     current_room_y = current_room_y - 1
                     current_room_x = current_room_x
-                    Dungeon.create_branch(rooms, room_amount, dungeon_map, good_dungeon, current_room_y, current_room_x, break_off_points, previous_x, previous_y)
                 if next_room == 4:
                     room_amount += 1
-                    possible_rooms.remove(next_room)
                     dungeon_map[current_room_y][current_room_x - 1] = rooms[0]
                     rooms.pop(0)
                     previous_x = current_room_x
                     previous_y = current_room_y
                     current_room_y = current_room_y
                     current_room_x = current_room_x - 1
-                    Dungeon.create_branch(rooms, room_amount, dungeon_map, good_dungeon, current_room_y, current_room_x, break_off_points, previous_x, previous_y)
+                Dungeon.create_branch(rooms, room_amount, dungeon_map, good_dungeon, current_room_y, current_room_x, unused_rooms, previous_x, previous_y)
             else:
-                current_room_y = previous_y
-                current_room_x = previous_x
-                Dungeon.create_branch(rooms, room_amount, dungeon_map, good_dungeon, current_room_y, current_room_x, break_off_points, previous_x, previous_y)
-            
-                
-    def generate(self):
-        dungeon_map = [
-        [0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0]
-        ]
-        good_dungeon = False
-        cols = 5
-        rows = 5
-        print(dungeon_map)
-        rooms = [1, 2, 3, 4, 5, 6, 
-    7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 
-    17, 18, 19, 20, 21, 22, 23, 24, 25]
-        
-        start_room_num = rooms[0]
-        starting_room_y = 4
-        starting_room_x = random.choice(range(4))
-        dungeon_map[starting_room_y][starting_room_x] = start_room_num
-        rooms.remove(start_room_num)
-        room_amount = 1
-        current_room_y = starting_room_y
-        current_room_x = starting_room_x
-        new_room_probability = 1
-        break_off_points = []
-        previous_x = starting_room_x
-        previous_y = starting_room_y
-        dungeon_map = Dungeon.create_branch(rooms, room_amount, new_room_probability, dungeon_map, good_dungeon, current_room_y, current_room_x, break_off_points)
-        print(dungeon_map)
-        
-    
-# Creates main
-if __name__=="__main__":
-    main()
+                if len(unused_rooms) > 0:
+                    next_room = unused_rooms[0]
+                    for y in range(5):
+                        for x in range(5):
+                            if dungeon_map[y][x] == next_room:
+                                current_room_y = y
+                                current_room_x = x
+                    Dungeon.create_branch(rooms, room_amount, dungeon_map, good_dungeon, current_room_y, current_room_x, unused_rooms, previous_x, previous_y)
