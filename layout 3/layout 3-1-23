@@ -1,0 +1,27 @@
+dungeon_layout - [[0 for i in range(5)] for j in range (5)]
+def dfs(row, col):
+    if row>= len(dungeon_layout):
+        return
+    if row < 0:
+        return
+    if col >= len(dungeon_layout[[0]]):
+        return
+    if col < 0:
+        return
+#0
+if dungeon_layout[row][col] <= 0:
+        return
+#prints
+print(dungeon_layout[row][col],
+"you are here")
+dungeon_layout[row][col] = -dungeon_layout[row][col]
+#try north
+dfs (row-1, col)
+#try east
+dfs (row, col+1)
+#try south
+dfs (row+1, col)
+#try west
+dfs (row, col-1)
+if__name__== '__main__'
+dfs(1,1)
