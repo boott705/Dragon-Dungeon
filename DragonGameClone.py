@@ -1,8 +1,7 @@
 import random
-import math
 begin = 0
+start_room_index = 0
 total_rooms = 0
-i = 0
 dragon_room = 0
 shield_room = 0
 key_room = 0
@@ -10,7 +9,6 @@ sword_room = 0
 terminal_rooms = []
 player_y = 4
 player_x = 0
-dungeon = []
 quit = False
 # Main function
 def main():
@@ -20,16 +18,16 @@ def main():
     global sword_room
     global player_y
     global player_x
-    global dungeon
     global quit
     # Tests main
     print("This is a dragon game.")
-    Dungeon.generate()
-    player_x = begin
+    dungeon = Dungeon.generate()
+    player_x = start_room_index
     while quit == False:
-        player_y, player_x = Player.movement(player_y, player_x)
         print(player_y, player_x)
+        player_y, player_x = Player.movement(player_y, player_x, dungeon)
         quit = True
+
 class Player:
     def __init__(self):
          self.x = begin
@@ -38,16 +36,20 @@ class Player:
          self.hasShield = False
          self.hasKey = False
 
-    def movement(player_y, player_x):
+    def movement(player_y, player_x, dungeon):
         available_directions = []
-        if player_y > 0 and dungeon[player_y - 1][player_x] < 0:
-            available_directions.append("North")
-        if player_x < 4 and dungeon[player_y][player_x + 1] < 0:
-            available_directions.append("East")
-        if player_y > 4 and dungeon[player_y + 1][player_x] < 0:
-            available_directions.append("South")
-        if player_x > 0 and dungeon[player_y][player_x - 1] < 0:
-            available_directions.append("West")
+        if player_y > 0:
+            if dungeon[player_y - 1][player_x] < 0:
+                available_directions.append("North")
+        if player_x < 4:
+            if dungeon[player_y][player_x + 1] < 0:
+                available_directions.append("East")
+        if player_y < 4:
+            if dungeon[player_y + 1][player_x] < 0:
+                available_directions.append("South")
+        if player_x > 0:
+            if dungeon[player_y][player_x - 1] < 0:
+                available_directions.append("West")
         prompt = "Which way would you like to go:"
         for direction in available_directions:
             if direction != available_directions[-1]:
@@ -61,7 +63,7 @@ class Player:
             if direction == "Quit":
                 exit()
             if direction.capitalize() not in available_directions:
-                print("Sorry, you can'Qu go that way.")
+                print("Sorry, you can't go that way.")
             if direction == "North" or direction == "north":
                 player_x = player_x 
                 player_y = player_y - 1
@@ -100,17 +102,18 @@ class Dungeon:
         self.key_room = None
         self.roar_room = None
         self.num_dungeons_generated = 0
-        
-    def toPositive(dungeon):
-        rowNum = 0
-        colNum = 0
-        for row in dungeon:
-            for col in row:
-                dungeon[rowNum][colNum] = abs(col)
-                colNum += 1
-            rowNum += 1
-            colNum = 0
-        return dungeon
+
+    def shuffleDungeon(arr2d): #Randomized rooms
+    #Shuffes entries of 2-d array arr2d, preserving shape.
+        reshape = [ ]
+        data = [ ]
+        iend = 0
+        for row in arr2d:
+            data.extend (row)
+            istart, iend = iend, iend+len (row)
+            reshape. append ((istart, iend))
+        random.shuffle(data)
+        return [data[istart: iend] for (istart, iend) in reshape]
     
     def dfs(row, col, dungeon):
         #CHECK BOUNDS
@@ -126,21 +129,10 @@ class Dungeon:
             if col < 0 and total_rooms <= 16:
                 return
             #Check for 0
-            if dungeon[row][col] <= 0:
-                return
-            neighbors = []
-            if row > 0 and dungeon[row-1][col] < 0:
-                neighbors.append((row-1, col))
-            if col > 0 and dungeon[row][col-1] < 0:
-                neighbors.append((row, col-1))
-            if row < len(dungeon)-1 and dungeon[row+1][col] < 0:
-                neighbors.append((row+1, col))
-            if col < len(dungeon[0])-1 and dungeon[row][col+1] < 0:
-                neighbors.append((row, col+1))
-            if dungeon[row][col] < 0 and len(neighbors) == 1:
-                terminal_rooms.append(dungeon[row][col])
+            if dungeon[row][col] < 0:
+                total_rooms -= 1
             #WE'VE ALREADY BEEN HERE
-            dungeon[row][col] = -dungeon[row][col]
+            dungeon[row][col] = -abs(dungeon[row][col])
             total_rooms += 1
             directions = ['N', 'E', 'S', 'W']
             random.shuffle(directions)
@@ -156,7 +148,7 @@ class Dungeon:
                     Dungeon.dfs(row, col-1, dungeon)
         else:
             return
-    
+
     def print_ascii(dungeon_map):
         global begin
         ascii_map = ""
@@ -171,7 +163,7 @@ class Dungeon:
             ascii_map += "\n"
             for room in row:
                 if room == begin:
-                   ascii_map += "║ Start  ║"
+                    ascii_map += "║ Start  ║"
                 else:
                     ascii_map += "║        ║"
             ascii_map += "\n"
@@ -193,29 +185,64 @@ class Dungeon:
             ascii_map += "\n"
         print(ascii_map)
 
+    def countTerminal(terminal_rooms, dungeon):
+        global begin
+        neighbors = []
+        rowNum = 0
+        colNum = 0
+        for row in dungeon:
+            for col in row:
+                if rowNum > 0 and dungeon[rowNum-1][colNum] < 0:
+                    neighbors.append('+')
+                if colNum > 0 and dungeon[rowNum][colNum-1] < 0:
+                    neighbors.append('+')
+                if rowNum < 4 and dungeon[rowNum+1][colNum] < 0:
+                    neighbors.append('+')
+                if colNum < 4 and dungeon[rowNum][colNum+1] < 0:
+                    neighbors.append('+')
+                if dungeon[rowNum][colNum] < 0 and dungeon[rowNum][colNum] != -begin and len(neighbors) == 1:
+                    terminal_rooms.append(dungeon[rowNum][colNum])
+                colNum += 1
+                neighbors = []
+            rowNum += 1
+            colNum = 0
+        return terminal_rooms
+
+    def checkDungeon(dungeon, all_valid):
+        global terminal_rooms
+        global begin
+        global start_room_index
+        start_room_index = random.choice(range(len(dungeon[4])))
+        begin = dungeon[4][start_room_index]
+        Dungeon.dfs(4, start_room_index, dungeon)
+        terminal_rooms = Dungeon.countTerminal(terminal_rooms, dungeon)
+        print(terminal_rooms)
+        if len(terminal_rooms) > 0:
+            all_valid = True
+        return all_valid
 
     def generate():
         global begin
+        global start_room_index
+        global total_rooms
         global terminal_rooms
-        print('hello')
-        terminal_rooms = []
-        dungeon_map = [
-        [1, 2, 3, 4, 5],
-        [6, 7, 8, 9, 10],
-        [11, 12, 13, 14, 15],
-        [16, 17, 18, 19, 20],
-        [21, 22, 23, 24, 25]
-        ] 
         all_valid = False
         while all_valid == False:
-            dungeon_map = Dungeon.toPositive(dungeon_map)
-            start_room = random.randint(0, 4)
-            begin = start_room
-            Dungeon.dfs(4, start_room, dungeon)
+            dungeon_map = [
+            [1, 2, 3, 4, 5],
+            [6, 7, 8, 9, 10],
+            [11, 12, 13, 14, 15],
+            [16, 17, 18, 19, 20],
+            [21, 22, 23, 24, 25]
+            ] 
+            begin = 0
+            start_room_index = 0
+            total_rooms = 0
+            #dungeon_map = Dungeon.shuffleDungeon(dungeon_map)
+            all_valid = Dungeon.checkDungeon(dungeon_map, all_valid)
             print(dungeon_map)
             Dungeon.print_ascii(dungeon_map)
-            all_valid = True
         return dungeon_map
-    
+
 if __name__ == "__main__":
     main()
