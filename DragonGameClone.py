@@ -72,12 +72,13 @@ class Player:
                 prompt += f" {direction}."
         print("")
         print(prompt)
+        print("Type Show Map to show the dungeon map.")
         validDirection = False
         while validDirection == False:
             #Type 'Show Map' to view dungeon map.
             direction = input("Your choice: ")
-            if direction == "Show Map":
-                Dungeon.print_ascii(dungeon)
+            if direction.lower() == "show map":
+                Dungeon.print_ascii(dungeon, player_y, player_x)
                 return player_y, player_x
             elif direction.lower() not in available_directions:
                 print("")
@@ -270,39 +271,36 @@ class Dungeon:
         else:
             return
 
-    def print_ascii(dungeon_map):
+    def print_ascii(dungeon_map, player_y, player_x):
         global begin
         ascii_map = ""
         for row in dungeon_map:
             for room in row:
-                if room == begin:
-                    ascii_map += "╔════════╗"
-                elif room < 0:
-                    ascii_map += "║ ROOM   ║"
-                else:
-                    ascii_map += "║        ║"
-            ascii_map += "\n"
-            for room in row:
                 if room == -begin:
-                    ascii_map += "║ Start  ║"
+                    ascii_map += "║  START  ║"
+                elif room < 0:
+                    ascii_map += "║  ROOM   ║"
                 else:
-                    ascii_map += "║        ║"
+                    ascii_map += "║         ║"
             ascii_map += "\n"
             for room in row:
-                if room == begin:
-                    ascii_map += "║        ║"
-                elif room < 0:
-                    ascii_map += "║        ║"
-                else:
-                    ascii_map += "║        ║"
+                ascii_map += "║         ║"
             ascii_map += "\n"
             for room in row:
-                if room == begin:
-                    ascii_map += "╚════════╝"
+                if room == dungeon_map[player_y][player_x]:
+                    ascii_map += "║ You Are ║"
                 elif room < 0:
-                    ascii_map += "║        ║"
+                    ascii_map += "║         ║"
                 else:
-                    ascii_map += "║        ║"
+                    ascii_map += "║         ║"
+            ascii_map += "\n"
+            for room in row:
+                if room == dungeon_map[player_y][player_x]:
+                    ascii_map += "║  Here   ║"
+                elif room < 0:
+                    ascii_map += "║         ║"
+                else:
+                    ascii_map += "║         ║"
             ascii_map += "\n"
         print(ascii_map)
 
