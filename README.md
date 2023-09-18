@@ -8,7 +8,7 @@ To run the game, follow these instructions:
 1. Make sure you have Python 3.x installed on your computer.
 2. Download the dungeon_game.py file.
 3. Open a terminal or command prompt.
-4. Navigate to the directory where dungeon_game.py is located.
+4. Navigate to the directory where dragon_dungeon_game.py is located.
 5. Run the game by entering the following command:
    python dungeon_game.py
 6. Follow the on-screen instructions to play the game.
